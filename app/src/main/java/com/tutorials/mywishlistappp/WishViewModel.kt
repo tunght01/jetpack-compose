@@ -5,13 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tutorials.mywishlistappp.data.Graph
 import com.tutorials.mywishlistappp.data.Wish
 import com.tutorials.mywishlistappp.data.WishRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class WishViewModel(private val wishRepository: WishRepository): ViewModel() {
+class WishViewModel(
+    private val wishRepository: WishRepository= Graph.wishReposiottory
+): ViewModel() {
     var wishTtileState by mutableStateOf("")
     var wishDescriptionState by mutableStateOf("")
 
@@ -38,7 +41,7 @@ class WishViewModel(private val wishRepository: WishRepository): ViewModel() {
         }
     }
 
-    suspend fun getAWíhById(id:Long):Flow<Wish>{
+     fun getAWíhById(id:Long):Flow<Wish>{
         return wishRepository.getAWishById(id)
     }
     fun updateWish(wish: Wish){

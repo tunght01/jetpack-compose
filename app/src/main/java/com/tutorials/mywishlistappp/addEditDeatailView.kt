@@ -17,9 +17,15 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.tutorials.mywishlistappp.data.Wish
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddEditDeatailView(
@@ -39,7 +47,24 @@ fun AddEditDeatailView(
     viewModel: WishViewModel,
     navController: NavController
 ){
-    Scaffold(topBar = {
+    val snackMessage = remember {
+        mutableStateOf("")
+    }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    if (id != 0L){
+        val wish = viewModel.getAWíhById(id).collectAsState(initial = Wish(0L,"",""))
+        viewModel.wishTtileState = wish.value.title
+        viewModel.wishDescriptionState = wish.value.description
+
+    }else{
+        viewModel.wishTtileState =""
+        viewModel.wishDescriptionState =""
+
+    }
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
         AppBarView(title =
             if (id != 0L) stringResource(id = R.string.add_wish)
             else stringResource(id = R.string.add_wish)
@@ -64,7 +89,30 @@ fun AddEditDeatailView(
                 viewModel.wishDescriptionStateChanged(it)
             })
                 Spacer(modifier = Modifier.height(20.dp))
-        Button(onClick = {  }, colors = ButtonDefaults.buttonColors(
+        Button(onClick = {
+                         if (viewModel.wishTtileState.isNotEmpty() && viewModel.wishDescriptionState.isNotEmpty()){
+                             if (id != 0L){
+                                 viewModel.updateWish(
+                                     Wish(id = id,title = viewModel.wishTtileState.trim(), description = viewModel.wishDescriptionState.trim())
+                                 )
+                                 snackMessage.value = "Wish has been updated"
+                             }else{
+                                 viewModel.addWish(
+                                     Wish(title =  viewModel.wishTtileState.trim(),
+                                         description = viewModel.wishDescriptionState)
+                                 )
+                                 snackMessage.value = "Wish has been created"
+
+                             }
+                         }else{
+                             snackMessage.value = "Enter fields to create a wish"
+                         }
+            scope.launch {
+                navController.navigateUp()
+                snackbarHostState.showSnackbar(snackMessage.value)
+            }
+
+        }, colors = ButtonDefaults.buttonColors(
             containerColor = colorResource(id = R.color.appbar_color)
         )
         ) {
@@ -87,7 +135,9 @@ fun WishTextFiledf(
         value = value, 
         onValueChange = onValueSchanged,
         label = {Text(text = label, color = Color.Black)},
-        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 15.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 15.dp),
 
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         colors = TextFieldDefaults.outlinedTextFieldColors(

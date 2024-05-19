@@ -15,7 +15,7 @@ abstract class WishDao {
 
     // lấy tất cả dữ liệu from the wish table
     @Query("Select * from `wish-table`")
-    abstract suspend fun getAllWishes(): Flow<List<Wish>>
+    abstract  fun getAllWishes(): Flow<List<Wish>>
 
     @Update
     abstract suspend fun updateAWish(wishEntity: Wish)
@@ -24,6 +24,6 @@ abstract class WishDao {
     abstract suspend fun deletaAWish(wishEntity: Wish)
 
     @Query("Select * from `wish-table` where id=:id")
-    abstract suspend fun getAWishesById(id:Long): Flow<Wish>
+    abstract fun getAWishesById(id:Long): Flow<Wish>
 
 }

@@ -7,9 +7,9 @@ class WishRepository(private val wishDao: WishDao) {
         wishDao.addAWish(wish)
     }
 
-    suspend fun getWish():Flow<List<Wish>> = wishDao.getAllWishes()
+      fun getWish():Flow<List<Wish>> = wishDao.getAllWishes()
 
-    suspend fun getAWishById(id:Long):Flow<Wish>{
+      fun getAWishById(id:Long):Flow<Wish>{
         return wishDao.getAWishesById(id)
     }
     suspend fun updateAWish(wish: Wish){
